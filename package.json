@@ -1,5 +1,5 @@
 {
-  "name": "astroblog",
+  "name": "new",
   "type": "module",
   "version": "0.0.1",
   "scripts": {
@@ -10,6 +10,16 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^4.5.5"
+    "@astrojs/rss": "^4.0.5",
+    "@astrojs/sitemap": "^3.1.1",
+    "@astrojs/tailwind": "^5.1.0",
+    "astro": "^4.5.5",
+    "astro-icon": "^1.1.0",
+    "dompurify": "^3.0.9",
+    "fuse.js": "^7.0.0",
+    "highlight.js": "^11.9.0",
+    "postcss-preset-env": "^9.5.1",
+    "sharp": "^0.33.2",
+    "tailwindcss": "^3.4.1"
   }
 }

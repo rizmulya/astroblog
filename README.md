@@ -1,5 +1,7 @@
 # Astro Starter Kit: Basics
 
+<b>code modified from</b> [coding-in-public](https://github.com/coding-in-public/)
+
 ```sh
 npm create astro@latest -- --template basics
 ```

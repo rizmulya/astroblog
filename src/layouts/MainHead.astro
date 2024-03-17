@@ -1,0 +1,31 @@
+---
+// component imports
+import Seo from "../components/Seo.astro";
+
+const { title, description, image, frontmatter, robots } = Astro.props;
+---
+
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="viewport" content="width=device-width" />
+  <meta name="generator" content={Astro.generator} />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+
+  <Seo {title} {description} url={Astro.url} {image} {frontmatter} {robots} />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" /><link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  /><link
+    href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- https://cdnjs.com/libraries/highlight.js -->
+  <link rel="stylesheet" href="/asset/css/tomorrow-night-bright.min.css">
+  <script is:inline src="/asset/js/highlight.min.js"></script>
+  <script is:inline src="/asset/js/highlight-copy.js"></script>
+</head>
