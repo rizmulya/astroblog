@@ -22,7 +22,9 @@ export function slugify(text) {
 
 export function formatDate(date) {
   return new Date(date).toLocaleDateString("en-US", {
-    timeZone: "UTC",
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
   });
 }
 
