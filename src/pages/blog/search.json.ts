@@ -1,4 +1,5 @@
 import { getCollection } from "astro:content";
+import { slugify } from "../../js/utils";
 
 async function getPosts() {
   const posts = (await getCollection("blog")).sort(
@@ -9,7 +10,9 @@ async function getPosts() {
     slug: post.slug,
     title: post.data.title,
     description: post.data.description,
-    date: post.data.date
+    date: post.data.date,
+    category: { get: post.data.category, slug: slugify(post.data.category) },
+    image: post.data.image,
   }));
 }
 

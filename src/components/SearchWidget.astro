@@ -1,0 +1,168 @@
+---
+
+---
+
+<aside class="form">
+  <div>
+    <label for="search">Search the Blog</label>
+  </div>
+  <input
+    type="search"
+    required
+    min="2"
+    max="24"
+    name="search"
+    id="search"
+    placeholder="Enter a search term…"
+  />
+</aside>
+<p id="searchReadout"></p>
+<!-- <section id="searchResults" class="post-container" aria-label="Search Results">
+</section> -->
+<script>
+  import DOMPurify from "dompurify";
+  import Fuse from "fuse.js";
+
+  let SEARCH_DATA;
+  let FUSE_INSTANCE;
+  const FUSE_OPTIONS = {
+    includeScore: true,
+    shouldSort: false,
+    threshold: 0.5,
+    keys: [
+      {
+        name: "title",
+        weight: 1,
+      },
+      {
+        name: "description",
+        weight: 0.75,
+      },
+    ],
+  };
+
+  const SPINNER = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256" id="spinner"><path d="M236,128a108,108,0,0,1-216,0c0-42.52,24.73-81.34,63-98.9A12,12,0,1,1,93,50.91C63.24,64.57,44,94.83,44,128a84,84,0,0,0,168,0c0-33.17-19.24-63.43-49-77.09A12,12,0,1,1,173,29.1C211.27,46.66,236,85.48,236,128Z"></path><style>
+			#spinner {
+				animation: spin 1s linear infinite;
+			}
+			@keyframes spin {
+				100% {
+					transform: rotate(360deg);
+				}
+			}
+			</style></svg>`;
+
+  // selectors
+  const search = document.querySelector("#search");
+  const searchReadout = document.querySelector("#searchReadout");
+  const resultsList = document.querySelector("#searchResults");
+
+  // functions
+  function updateDocumentTitle(search) {
+    document.title = search
+      ? `Search results for “${search}”`
+      : "Search the Blog";
+  }
+
+  function updateSearchReadout(search) {
+    searchReadout.textContent = search ? `Search results for “${search}”` : "";
+  }
+
+  function updateSearchPageURL(search) {
+    const url = new URL(window.location.href);
+    url.searchParams.set("q", search);
+    window.history.replaceState(null, "", url);
+  }
+
+  function generateSearchList(results) {
+    return results
+      .map((r) => {
+        const { title, date, slug, description, image, category } = r.item;
+        const dateAsDate = new Date(date);
+        return `
+        <article class="card">
+          <small>
+            <a href="/category/${category.slug}" class="badge">${category.get}</a>
+          </small>
+          <a href="/blog/${slug}" aria-hidden="true" tabindex="-1">
+            <img
+              src="${image.src}"
+              alt="${image.alt}"
+              fit="cover"
+              aspectratio="4:1"
+              width="400"
+              height="250"
+              loading="lazy"
+              decoding="async"
+            />
+          </a>
+          <div class="content">
+            <div>
+              <h3 class="h3">
+                <a href="/blog/${slug}">${title}</a>
+              </h3>
+              <small>${date}</small>
+            </div>
+            <p>${description}</p>
+            <a href="/blog/${slug}" class="link secondary filled">
+              <span>Read Post</span>
+            </a>
+          </div>
+        </article>`;
+      })
+      .join("");
+  }
+
+  async function fetchSearchResults(search) {
+    if (search.length === 0) return;
+    resultsList.innerHTML = SPINNER;
+    if (!SEARCH_DATA) {
+      try {
+        const res = await fetch("/blog/search.json");
+        if (!res.ok) {
+          throw new Error("Something went wrong…please try again");
+        }
+        const data = await res.json();
+        SEARCH_DATA = data;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    if (SEARCH_DATA && !FUSE_INSTANCE) {
+      FUSE_INSTANCE = new Fuse(SEARCH_DATA, FUSE_OPTIONS);
+    }
+    if (!FUSE_INSTANCE) return;
+    const searchResult = FUSE_INSTANCE.search(search);
+    resultsList.innerHTML =
+      searchResult.length > 0
+        ? generateSearchList(searchResult)
+        : "No results found…";
+  }
+
+  function clearSearch() {
+    const url = new URL(window.location.href);
+    window.location.href = url.href.split("?q=")[0];
+  }
+
+  // event listeners
+  window.addEventListener("DOMContentLoaded", () => {
+    const urlParams = DOMPurify.sanitize(
+      new URLSearchParams(window.location.search).get("q")
+    );
+    fetchSearchResults(urlParams);
+    updateDocumentTitle(urlParams);
+    updateSearchReadout(urlParams);
+    search.value = urlParams;
+    search?.focus();
+  });
+
+  search?.addEventListener("input", () => {
+    const searchTerm = DOMPurify.sanitize(search.value);
+    updateDocumentTitle(searchTerm);
+    updateSearchReadout(searchTerm);
+    fetchSearchResults(searchTerm);
+    updateSearchPageURL(searchTerm);
+
+    if (searchTerm === "") clearSearch();
+  });
+</script>
